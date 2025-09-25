@@ -1,8 +1,8 @@
 package com.sweetmanagement.backend.serviceTest;
 
-import com.sweetmanagement.backend.controller.SweetRequest;
 import com.sweetmanagement.backend.entity.Sweet;
 import com.sweetmanagement.backend.repository.SweetRepository;
+import com.sweetmanagement.backend.service.SweetService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
-class SweetServiceIntegrationTest {
+class SweetServiceTest {
 
     @Autowired
     private SweetService sweetService;
@@ -31,19 +30,18 @@ class SweetServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Clean and seed the database before each test
         sweetRepository.deleteAll();
 
         sweet1 = new Sweet();
         sweet1.setName("Gulab Jamun");
         sweet1.setCategory("Traditional");
-        sweet1.setPrice(new BigDecimal("2.50"));
+        sweet1.setPrice(2.50);
         sweet1.setQuantity(100);
 
         sweet2 = new Sweet();
         sweet2.setName("Rasmalai");
         sweet2.setCategory("Dairy");
-        sweet2.setPrice(new BigDecimal("4.00"));
+        sweet2.setPrice(4.00);
         sweet2.setQuantity(50);
 
         sweetRepository.save(sweet1);
@@ -52,10 +50,10 @@ class SweetServiceIntegrationTest {
 
     @Test
     void testCreateSweet() {
-        SweetRequest request = new SweetRequest();
+        Sweet request = new Sweet();
         request.setName("Jalebi");
         request.setCategory("Fried");
-        request.setPrice(new BigDecimal("1.50"));
+        request.setPrice(1.50);
         request.setQuantity(200);
 
         Sweet createdSweet = sweetService.createSweet(request);
@@ -73,22 +71,22 @@ class SweetServiceIntegrationTest {
 
     @Test
     void testUpdateSweet_Success() {
-        SweetRequest updateRequest = new SweetRequest();
+        Sweet updateRequest = new Sweet();
         updateRequest.setName("Royal Gulab Jamun");
-        updateRequest.setPrice(new BigDecimal("3.00"));
+        updateRequest.setPrice(3.00);
         updateRequest.setCategory("Premium");
         updateRequest.setQuantity(80);
 
         Sweet updatedSweet = sweetService.updateSweet(sweet1.getId(), updateRequest);
 
         assertThat(updatedSweet.getName()).isEqualTo("Royal Gulab Jamun");
-        assertThat(updatedSweet.getPrice()).isEqualTo(new BigDecimal("3.00"));
+        assertThat(updatedSweet.getPrice()).isEqualTo(3.00);
         assertThat(updatedSweet.getQuantity()).isEqualTo(80);
     }
 
     @Test
     void testUpdateSweet_NotFound() {
-        SweetRequest request = new SweetRequest();
+        Sweet request = new Sweet();
         assertThrows(EntityNotFoundException.class, () -> {
             sweetService.updateSweet(999L, request);
         });
@@ -103,8 +101,6 @@ class SweetServiceIntegrationTest {
         assertThat(countAfter).isEqualTo(countBefore - 1);
         assertThat(sweetRepository.findById(sweet1.getId())).isEmpty();
     }
-
-
 
     @Test
     void testDeleteSweet_NotFound() {
@@ -129,14 +125,14 @@ class SweetServiceIntegrationTest {
 
     @Test
     void testSearchSweets_byPriceRange() {
-        List<Sweet> results = sweetService.searchSweets(null, null, new BigDecimal("3.00"), new BigDecimal("5.00"));
+        List<Sweet> results = sweetService.searchSweets(null, null, 3.00, 5.00);
         assertThat(results).hasSize(1);
         assertThat(results.get(0).getName()).isEqualTo("Rasmalai");
     }
 
     @Test
     void testSearchSweets_byNameAndPrice() {
-        List<Sweet> results = sweetService.searchSweets("Rasmalai", null, new BigDecimal("3.00"), null);
+        List<Sweet> results = sweetService.searchSweets("Rasmalai", null, 3.00, null);
         assertThat(results).hasSize(1);
     }
 
