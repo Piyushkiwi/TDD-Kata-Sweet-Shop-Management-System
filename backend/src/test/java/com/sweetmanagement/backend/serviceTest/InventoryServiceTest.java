@@ -2,6 +2,7 @@ package com.sweetmanagement.backend.serviceTest;
 
 import com.sweetmanagement.backend.entity.Sweet;
 import com.sweetmanagement.backend.repository.SweetRepository;
+import com.sweetmanagement.backend.service.InventoryService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
