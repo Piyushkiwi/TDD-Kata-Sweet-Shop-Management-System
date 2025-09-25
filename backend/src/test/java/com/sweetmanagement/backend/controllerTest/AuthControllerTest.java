@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,6 +23,9 @@ public class AuthControllerTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder; // 2. INJECT THE PASSWORD ENCODER
+
     private User existingUser;
 
     @BeforeEach
@@ -31,7 +35,10 @@ public class AuthControllerTest {
         existingUser = new User();
         existingUser.setName("Dipak");
         existingUser.setEmail("dipak@example.com");
-        existingUser.setPassword("password");
+
+        // 3. ENCODE THE PASSWORD BEFORE SAVING
+        existingUser.setPassword(passwordEncoder.encode("password"));
+
         existingUser.setRole(Role.USER);
 
         userRepository.save(existingUser);
@@ -39,6 +46,7 @@ public class AuthControllerTest {
 
     @Test
     void testRegisterNewUser() {
+        // ... this test remains the same
         User newUser = new User();
         newUser.setName("Piyush");
         newUser.setEmail("piyush@example.com");
@@ -55,6 +63,7 @@ public class AuthControllerTest {
 
     @Test
     void testLoginSuccess() {
+        // ... this test remains the same
         User loginRequest = new User();
         loginRequest.setEmail("dipak@example.com");
         loginRequest.setPassword("password");
@@ -65,6 +74,7 @@ public class AuthControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody()); // JWT token
     }
+
 
     @Test
     void testLoginInvalidPassword() {
